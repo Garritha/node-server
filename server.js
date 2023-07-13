@@ -1,40 +1,21 @@
-const http  = require('http');
+const express = require('express');
+const app = express();
+const port = 8080;
 
-const server = http.createServer((req, res) => {
-    res.setHeader("Content-Type", "application/json");
-    
-    // Ruta de solicitud
+app.get('/tareas', (req, res) => {
+  const tareas = [
+    { id: 1, descripcion: 'Sacar al perro', estado: 'pendiente' },
+    { id: 2, descripcion: 'Hacer ejercicio', estado: 'completada' },
+    { id: 3, descripcion: 'Hacer mercado', estado: 'completada' }
+  ];
 
-    if (req.url === "/tareas" && req.method === "GET") {
-
-        // arreglo de tareas
-
-        const tareas = [
-            {id: 1, descripcion: "Sacar al perro", estado: "pendiente" },
-            {id: 2, descripcion: "Hacer ejercicio", estado: "completada"},
-            {id: 3, descripcion: "Hacer mercado", estado:"completada"}
-        ];
-
-        // Devolucion del arreglo en formato json 
-
-        res.statusCode = 200;
-        res.end(JSON.stringify(tareas));
-    
-    } else {
-        // Ruta no encontrada
-        res.statusCode = 404;
-        res.end();
-
-        }
-
+  res.json(tareas);
 });
 
-const puerto = 8080;
-
-// INICIO DEL SERVER 
-
-server.listen(puerto,() => {
-    console.log("servidor Http iniciando en httpp:localhost:${puerto}");
+app.use((req, res) => {
+  res.status(404).end();
 });
 
-
+app.listen(port, () => {
+  console.log(`Servidor Express iniciado en http://localhost:${port}`);
+});
