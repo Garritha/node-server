@@ -11,26 +11,35 @@ let tareas = [];
 
 // Función para añadir una nueva tarea
 function añadirTarea(indicador, descripcion, estado) {
-  const tarea = {
-    indicador: indicador,
-    descripcion: descripcion,
-    estado: estado
-  };
+  return new Promise((resolve, reject) => {
+    const tarea = {
+      indicador: indicador,
+      descripcion: descripcion,
+      estado: estado
+    };
 
-  tareas.push(tarea);
+    tareas.push(tarea);
+    resolve();
+  });
 }
 
 // Función para eliminar una tarea
 function eliminarTarea(indicador) {
-  tareas = tareas.filter(tarea => tarea.indicador !== indicador);
+  return new Promise((resolve, reject) => {
+    tareas = tareas.filter(tarea => tarea.indicador !== indicador);
+    resolve();
+  });
 }
 
 // Función para marcar una tarea como completada
 function completarTarea(indicador) {
-  tareas.forEach(tarea => {
-    if (tarea.indicador === indicador) {
-      tarea.estado = 'completada';
-    }
+  return new Promise((resolve, reject) => {
+    tareas.forEach(tarea => {
+      if (tarea.indicador === indicador) {
+        tarea.estado = 'completada';
+      }
+    });
+    resolve();
   });
 }
 
@@ -46,37 +55,45 @@ function mostrarTareas() {
 }
 
 // Función para ejecutar la opción seleccionada por el usuario
-function ejecutarOpcion(opcion) {
+async function ejecutarOpcion(opcion) {
   switch (opcion) {
     case '1': {
-      rl.question('Ingrese el indicador de la tarea: ', indicador => {
-        rl.question('Ingrese la descripción de la tarea: ', descripcion => {
-          rl.question('Ingrese el estado de la tarea (completada o pendiente): ', estado => {
-            añadirTarea(indicador, descripcion, estado);
-            console.log('Tarea añadida con éxito!');
-            mostrarTareas();
-            rl.close();
-          });
-        });
-      });
+      try {
+        const indicador = await prompt('Ingrese el indicador de la tarea: ');
+        const descripcion = await prompt('Ingrese la descripción de la tarea: ');
+        const estado = await prompt('Ingrese el estado de la tarea (completada o pendiente): ');
+
+        await añadirTarea(indicador, descripcion, estado);
+        console.log('Tarea añadida con éxito!');
+        mostrarTareas();
+      } catch (error) {
+        console.error('Error al añadir la tarea:', error);
+      }
+      rl.close();
       break;
     }
     case '2': {
-      rl.question('Ingrese el indicador de la tarea que desea eliminar: ', indicador => {
-        eliminarTarea(indicador);
+      try {
+        const indicador = await prompt('Ingrese el indicador de la tarea que desea eliminar: ');
+        await eliminarTarea(indicador);
         console.log('Tarea eliminada con éxito!');
         mostrarTareas();
-        rl.close();
-      });
+      } catch (error) {
+        console.error('Error al eliminar la tarea:', error);
+      }
+      rl.close();
       break;
     }
     case '3': {
-      rl.question('Ingrese el indicador de la tarea que desea marcar como completada: ', indicador => {
-        completarTarea(indicador);
+      try {
+        const indicador = await prompt('Ingrese el indicador de la tarea que desea marcar como completada: ');
+        await completarTarea(indicador);
         console.log('Tarea marcada como completada con éxito!');
         mostrarTareas();
-        rl.close();
-      });
+      } catch (error) {
+        console.error('Error al completar la tarea:', error);
+      }
+      rl.close();
       break;
     }
     default: {
@@ -87,6 +104,15 @@ function ejecutarOpcion(opcion) {
   }
 }
 
+// Función para solicitar una entrada al usuario
+function prompt(question) {
+  return new Promise((resolve, reject) => {
+    rl.question(question, answer => {
+      resolve(answer);
+    });
+  });
+}
+
 // Mostrar opciones al usuario
 console.log('Seleccione una opción:');
 console.log('1. Añadir tarea');
@@ -94,6 +120,6 @@ console.log('2. Eliminar tarea');
 console.log('3. Completar tarea');
 
 // Leer opción seleccionada por el usuario
-rl.question('Opción: ', opcion => {
-  ejecutarOpcion(opcion);
+rl.question('Opción: ', async opcion => {
+  await ejecutarOpcion(opcion);
 });
