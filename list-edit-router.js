@@ -7,25 +7,8 @@ let tasks = [
   { id: 3, descripcion: 'Hacer mercado', estado: 'completada' }
 ];
 
-// Ruta para obtener todas las tareas
-router.get('/', (req, res) => {
-  res.json(tasks);
-});
-
-// Ruta para obtener una tarea por su ID
-router.get('/:id', (req, res) => {
-  const taskId = parseInt(req.params.id);
-  const task = tasks.find(task => task.id === taskId);
-
-  if (task) {
-    res.json(task);
-  } else {
-    res.status(404).json({ message: 'Tarea no encontrada' });
-  }
-});
-
-// Ruta para agregar una nueva tarea
-router.post('/', (req, res) => {
+// Ruta para crear una nueva tarea
+router.post('/crear', (req, res) => {
   const { descripcion, estado } = req.body;
 
   if (!descripcion || !estado) {
@@ -42,8 +25,21 @@ router.post('/', (req, res) => {
   }
 });
 
+// Ruta para eliminar una tarea
+router.delete('/eliminar/:id', (req, res) => {
+  const taskId = parseInt(req.params.id);
+  const taskIndex = tasks.findIndex(task => task.id === taskId);
+
+  if (taskIndex !== -1) {
+    tasks.splice(taskIndex, 1);
+    res.json({ message: 'Tarea eliminada' });
+  } else {
+    res.status(404).json({ message: 'Tarea no encontrada' });
+  }
+});
+
 // Ruta para actualizar una tarea existente
-router.put('/:id', (req, res) => {
+router.put('/actualizar/:id', (req, res) => {
   const taskId = parseInt(req.params.id);
   const { descripcion, estado } = req.body;
 
@@ -54,19 +50,6 @@ router.put('/:id', (req, res) => {
     task.estado = estado || task.estado;
 
     res.json(task);
-  } else {
-    res.status(404).json({ message: 'Tarea no encontrada' });
-  }
-});
-
-// Ruta para eliminar una tarea
-router.delete('/:id', (req, res) => {
-  const taskId = parseInt(req.params.id);
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
-
-  if (taskIndex !== -1) {
-    tasks.splice(taskIndex, 1);
-    res.json({ message: 'Tarea eliminada' });
   } else {
     res.status(404).json({ message: 'Tarea no encontrada' });
   }
