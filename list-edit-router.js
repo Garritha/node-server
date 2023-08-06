@@ -1,31 +1,47 @@
 const express = require('express');
 const router = express.Router();
 
-let tasks = [
-  { id: 1, descripcion: 'Sacar al perro', estado: 'pendiente' },
-  { id: 2, descripcion: 'Hacer ejercicio', estado: 'completada' },
-  { id: 3, descripcion: 'Hacer mercado', estado: 'completada' }
-];
+let tasks = require("./task.json");
 
-// Ruta para crear una nueva tarea
-router.post('/crear', (req, res) => {
+// Middleware para manejar errores de solicitudes POST y PUT
+function errorHandler(req, res, next) {
+  if (req.method === 'POST') {
+    const { descripcion, estado } = req.body;
+
+    if (!descripcion || !estado) {
+      return res.status(400).json({ message: 'Falta descripción o estado de la tarea' });
+    }
+  }
+
+  if (req.method === 'PUT') {
+    const { descripcion, estado } = req.body;
+
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: 'Cuerpo de la solicitud vacío' });
+    }
+
+    if (!descripcion || !estado) {
+      return res.status(400).json({ message: 'Falta descripción o estado de la tarea' });
+    }
+  }
+
+  next(); // Si no hay errores, pasa al siguiente middleware o ruta
+}
+
+// Agregar el middleware errorHandler a todas las rutas POST y PUT
+router.post('/crear', errorHandler, (req, res) => {
   const { descripcion, estado } = req.body;
 
-  if (!descripcion || !estado) {
-    res.status(400).json({ message: 'Falta descripción o estado de la tarea' });
-  } else {
-    const newTask = {
-      id: tasks.length + 1,
-      descripcion,
-      estado
-    };
+  const newTask = {
+    id: tasks.length + 1,
+    descripcion,
+    estado
+  };
 
-    tasks.push(newTask);
-    res.status(201).json(newTask);
-  }
+  tasks.push(newTask);
+  res.status(201).json(newTask);
 });
 
-// Ruta para eliminar una tarea
 router.delete('/eliminar/:id', (req, res) => {
   const taskId = parseInt(req.params.id);
   const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -38,8 +54,7 @@ router.delete('/eliminar/:id', (req, res) => {
   }
 });
 
-// Ruta para actualizar una tarea existente
-router.put('/actualizar/:id', (req, res) => {
+router.put('/actualizar/:id', errorHandler, (req, res) => {
   const taskId = parseInt(req.params.id);
   const { descripcion, estado } = req.body;
 
