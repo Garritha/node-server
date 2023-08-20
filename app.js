@@ -1,75 +1,32 @@
 const express = require('express');
-const router = express.Router();
+const app = express();
+const port = 3000;
 
-let tasks = [
-  { id: 1, descripcion: 'Sacar al perro', estado: 'pendiente' },
-  { id: 2, descripcion: 'Hacer ejercicio', estado: 'completada' },
-  { id: 3, descripcion: 'Hacer mercado', estado: 'completada' }
-];
+app.use(express.json());
 
-// Ruta para obtener todas las tareas
-router.get('/', (req, res) => {
-  res.json(tasks);
-});
+// Middleware global para gestionar métodos HTTP no válidos
+app.use((req, res, next) => {
+  const validMethods = ['GET', 'POST', 'PUT', 'DELETE'];
 
-// Ruta para obtener una tarea por su ID
-router.get('/:id', (req, res) => {
-  const taskId = parseInt(req.params.id);
-  const task = tasks.find(task => task.id === taskId);
-
-  if (task) {
-    res.json(task);
-  } else {
-    res.status(404).json({ message: 'Tarea no encontrada' });
+  if (!validMethods.includes(req.method)) {
+    return res.status(405).json({ message: 'Método no permitido' });
   }
+
+  next();
 });
 
-// Ruta para agregar una nueva tarea
-router.post('/', (req, res) => {
-  const { descripcion, estado } = req.body;
+const errorHandler = require('./src/middlewares/errorHandler');
+const taskRoutes = require('./src/routes/taskRoutes');
 
-  if (!descripcion || !estado) {
-    res.status(400).json({ message: 'Falta descripción o estado de la tarea' });
-  } else {
-    const newTask = {
-      id: tasks.length + 1,
-      descripcion,
-      estado
-    };
+app.use('/task', taskRoutes);
 
-    tasks.push(newTask);
-    res.status(201).json(newTask);
-  }
+// Middleware global para manejo de errores
+app.use(errorHandler);
+
+app.use((req, res) => {
+  res.status(404).end();
 });
 
-// Ruta para actualizar una tarea existente
-router.put('/:id', (req, res) => {
-  const taskId = parseInt(req.params.id);
-  const { descripcion, estado } = req.body;
-
-  const task = tasks.find(task => task.id === taskId);
-
-  if (task) {
-    task.descripcion = descripcion || task.descripcion;
-    task.estado = estado || task.estado;
-
-    res.json(task);
-  } else {
-    res.status(404).json({ message: 'Tarea no encontrada' });
-  }
+app.listen(port, () => {
+  console.log(`Servidor Express iniciado en http://localhost:${port}`);
 });
-
-// Ruta para eliminar una tarea
-router.delete('/:id', (req, res) => {
-  const taskId = parseInt(req.params.id);
-  const taskIndex = tasks.findIndex(task => task.id === taskId);
-
-  if (taskIndex !== -1) {
-    tasks.splice(taskIndex, 1);
-    res.json({ message: 'Tarea eliminada' });
-  } else {
-    res.status(404).json({ message: 'Tarea no encontrada' });
-  }
-});
-
-module.exports = router;
