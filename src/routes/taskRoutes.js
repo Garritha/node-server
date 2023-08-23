@@ -6,7 +6,7 @@ const validationMiddleware = require('../middlewares/validationMiddleware');
 router.get('/', taskController.getAllTasks);
 router.post('/crear', taskController.createTask);
 router.delete('/eliminar/:id', taskController.deleteTask);
-router.put('/actualizar/:id',  taskController.updateTask);
+router.put('/actualizar/:taskId',  taskController.updateTask);
 
 
 module.exports = router;

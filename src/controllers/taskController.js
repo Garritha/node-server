@@ -26,17 +26,17 @@ function deleteTask(req, res) {
 }
 
 function updateTask(req, res) {
-  const taskId = parseInt(req.params.id);
+  const {taskId} = req.params;
   const { descripcion, estado } = req.body;
 
   const task = tasks.find(task => task.id === taskId);
-
+  console.log(taskId);
   if (task) {
     console.log("tarea encontrada:", task);
     task.descripcion = descripcion || task.descripcion;
     task.estado = estado || task.estado;
-
-    res.json(task);
+  
+    res.status(202).json(task);
   } else {
      console.log("tarea no encontrada:", tasks);
     res.status(404).json({ message: 'Tarea no encontrada' });

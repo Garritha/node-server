@@ -1,8 +1,11 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 8080;
+
 
 app.use(express.json());
+
 
 // Middleware global para gestionar métodos HTTP no válidos
 app.use((req, res, next) => {
@@ -17,8 +20,12 @@ app.use((req, res, next) => {
 
 const errorHandler = require('./src/middlewares/errorHandler');
 const taskRoutes = require('./src/routes/taskRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const protectedRoutes = require('./src/routes/protectedRoutes');
 
 app.use('/task', taskRoutes);
+app.use('/auth', authRoutes);
+app.use('/protected', protectedRoutes);
 
 // Middleware global para manejo de errores
 app.use(errorHandler);
