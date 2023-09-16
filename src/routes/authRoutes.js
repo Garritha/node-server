@@ -1,35 +1,41 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const predefinedUsers = require("../utils/userData");
+const User = require('../models/userSchema');
 
 
 
 
-router.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  
-  console.log('username:', username);
-  console.log('password:', password);
+// Ruta para iniciar sesión
+router.post('/login', async (req, res) => {
+  const { mail, password } = req.body;
 
-  const user = predefinedUsers.find(user => user.username === username && user.password === password);
+  try {
+    // Busca un usuario con el correo electrónico proporcionado
+    const user = await User.findOne({ mail });
 
-  console.log('User:', user);
+    if (!user) {
+      console.log('Credenciales inválidas');
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
 
-  if (!user) {
-    console.log('Credenciales inválidas');
-    return res.status(401).json({ message: 'Credenciales inválidas' });
+    // Verifica si la contraseña coincide
+    if (password !== user.password) {
+      console.log('Credenciales inválidas');
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    // Genera un token JWT si las credenciales son válidas
+    const secret = process.env.JWT_SECRET;
+    const token = jwt.sign({ mail }, secret, { expiresIn: '1h' });
+
+    console.log('Token:', token);
+
+    res.json({ token });
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    res.status(500).json({ message: 'Error al iniciar sesión', error });
   }
-
-  const secret = process.env.JWT_SECRET;
-console.log("secreto:", process.env.JWT_SECRET);
-
-  const token = jwt.sign({ username }, secret, { expiresIn: '1h' });
-
-  console.log('Token:', token);
-
-  res.json({ token });
 });
-
 
 module.exports = router;

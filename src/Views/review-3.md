@@ -22,3 +22,4 @@
 
 # Ofrece una forma eficiente de mantener un registro de las tareas pendientes y completadas, lo que ayuda a reducir el estrés y a mantenerse organizado.   
 
+    En resumen, nuestra aplicación es una solución práctica y amigable para la gestión de tareas, diseñada para simplificar la vida diaria de nuestros usuari

@@ -1,12 +1,24 @@
 require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
 const port = 8080;
-
-
 app.use(express.json());
 
 
+// Conexion Database 
+
+const uri = process.env.MONGODB_URI;
+mongoose.connect(uri,{
+ useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() =>{
+  console.log('conexion exitosa a Data Base');
+})
+.catch((error) =>{
+  console.error('error al conectar a Data base', error);
+});
 // Middleware global para gestionar métodos HTTP no válidos
 app.use((req, res, next) => {
   const validMethods = ['GET', 'POST', 'PUT', 'DELETE'];
