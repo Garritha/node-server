@@ -1,25 +1,27 @@
 const mongoose = require('mongoose');
 
-// esuqema para coleccion "task"
-
+// Esquema para la colección "task"
 const taskSchema = new mongoose.Schema({
-    titulo:{
+    // ID automático
+    _id: mongoose.Schema.Types.ObjectId,
+
+    titulo: {
         type: String,
-        required: true //titulo obligatorio
+        required: true, // Título obligatorio
     },
-    descripcion : String,
-    fechadecreacion:{
-        type:Date,
-        default: Date.now, // establece la fecha de creacion automatica 
+    descripcion: String,
+    // Fecha de creación automática
+    fechadecreacion: {
+        type: Date,
+        default: Date.now,
     },
-    estado:{
-        type:String,
-        enum:['pendiente','en_progreso','completa'], // estados debe ser alguno de estos 
-        default:'pendiente',
+    estado: {
+        type: String,
+        enum: ['pendiente', 'en_progreso', 'completa'], // Estados debe ser alguno de estos
+        default: 'pendiente',
     },
-       
 });
 
 const Task = mongoose.model('Task', taskSchema);
 
-module.exports = Task; 
+module.exports = Task;
