@@ -1,25 +1,28 @@
-const mongoose = require ('mongoose');
+const mongoose = require('mongoose');
 
-//  esquema para "user"
 
 const userSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required:[true,'El nombre no puede estar vacio']
+    name: {
+      type: String,
+      required: [true, 'El nombre no puede estar vacío'],
     },
-    mail: {
-        type :String,
-        required:[ true , 'Debe ingresar un correo electronico'],
-        unique: [true ,'Este email ya esta registrado en la base de datos' ],
+    email: { 
+      type: String,
+      required: [true, 'Debe ingresar un correo electrónico'],
+      unique: [true, 'Este email ya está registrado en la base de datos'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Debe ingresar una contraseña'],
+      minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
     },
     rol: {
-        type: String,
-        enum: ['usuarios','administrador'], // Rol debe ser algunos de estos valores 
-        default: 'usuarios',
+      type: String,
+      enum: ['usuarios', 'administrador'], // Rol debe ser algunos de estos valores
+      default: 'usuarios',
     },
-    
-});
+  });
 
-const User = mongoose.model('User',userSchema);
-
-module.exports = User; 
+  const User = mongoose.model('User', userSchema);
+  
+  module.exports = User;
