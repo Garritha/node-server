@@ -11,6 +11,7 @@ async function createTask(req, res) {
       titulo, // Agregar el título aquí
       descripcion,
     });
+    
 
     // Guarda la tarea en MongoDB
     await newTask.save();
