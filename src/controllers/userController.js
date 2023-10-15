@@ -28,13 +28,14 @@ async function createUser(req, res) {
     console.log(newUser);
     await newUser.save();
 
-    return res.status(201).json({ message: 'Usuario creado con éxito' });
+    const token = jwt.sign({ userId: newUser._id, email: newUser.email }, secret, { expiresIn: '1h' });
+
+    return res.status(201).json({ message: 'Usuario creado con éxito', token, userId: newUser._id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 }
-
 // Resto del código sin cambios
 
 

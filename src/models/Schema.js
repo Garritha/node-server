@@ -2,23 +2,24 @@ const mongoose = require('mongoose');
 
 // Esquema para la colección "task"
 const taskSchema = new mongoose.Schema({
-    // ID automático
     _id: mongoose.Schema.Types.ObjectId,
-
     titulo: {
         type: String,
-        required: true, // Título obligatorio
+        required: true,
     },
     descripcion: String,
-    // Fecha de creación automática
     fechadecreacion: {
         type: Date,
         default: Date.now,
     },
     estado: {
         type: String,
-        enum: ['pendiente', 'en_progreso', 'completa'], // Estados debe ser alguno de estos
+        enum: ['pendiente', 'en_progreso', 'completa'],
         default: 'pendiente',
+    },
+    usuario: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', // Esto establece una referencia al modelo User
     },
 });
 

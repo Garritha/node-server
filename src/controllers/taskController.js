@@ -1,19 +1,22 @@
-const Task = require('../models/Schema')
-const mongoose = require('mongoose')
-
+const Task = require('../models/Schema');
+const mongoose = require('mongoose');
 
 async function createTask(req, res) {
   try {
     const { descripcion, titulo } = req.body;
+    const userId = req.user._id; 
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Usuario no autenticado' });
+    }
 
     const newTask = new Task({
-      _id: new mongoose.Types.ObjectId(), // Genera un nuevo ID
-      titulo, // Agregar el título aquí
+      _id: new mongoose.Types.ObjectId(),
+      titulo,
       descripcion,
+      usuario: userId,
     });
-    
 
-    // Guarda la tarea en MongoDB
     await newTask.save();
 
     console.log('Tarea guardada con éxito:', newTask);
@@ -21,21 +24,21 @@ async function createTask(req, res) {
     res.status(201).json(newTask);
   } catch (error) {
     console.error('Error al crear la tarea:', error);
-    res.status(500).json({ message: 'Error al crear la tarea', error });
+    return res.status(500).json({ message: 'Error al crear la tarea', error });
   }
 }
 
-// Actualiza una tarea existente por su ID en MongoDB
+
 async function updateTask(req, res) {
   try {
-    const { taskId } = req.params; // Obtiene el ID de la tarea de los parámetros de la URL
-    const { titulo, descripcion, estado } = req.body; // Obtiene los datos actualizados de la solicitud
+    const { taskId } = req.params;
+    const { titulo, descripcion, estado } = req.body;
 
-    // Busca la tarea por su ID en la base de datos
+    // Buscar la tarea por su ID en la base de datos
     const task = await Task.findById(taskId);
 
     if (task) {
-      // Actualiza los campos de la tarea con los datos proporcionados (si se proporcionan)
+      // Actualizar los campos de la tarea con los datos proporcionados (si se proporcionan)
       if (titulo !== undefined) {
         task.titulo = titulo;
       }
@@ -46,10 +49,10 @@ async function updateTask(req, res) {
         task.estado = estado;
       }
 
-      // Guarda la tarea actualizada en la base de datos
+      // Guardar la tarea actualizada en la base de datos
       await task.save();
 
-      // Responde con la tarea actualizada
+      // Responder con la tarea actualizada
       res.status(200).json(task);
     } else {
       res.status(404).json({ message: 'Tarea no encontrada' });
@@ -59,13 +62,11 @@ async function updateTask(req, res) {
   }
 }
 
-
-// Elimina una tarea existente por su ID en MongoDB
 async function deleteTask(req, res) {
   try {
     const { taskId } = req.params;
     const task = await Task.findByIdAndDelete(taskId);
-    console.log(taskId);
+
     if (task) {
       res.json({ message: 'Tarea eliminada' });
     } else {
@@ -76,17 +77,23 @@ async function deleteTask(req, res) {
   }
 }
 
-// Obtiene todas las tareas desde MongoDB
 async function getAllTasks(req, res) {
   try {
-    const tasks = await Task.find();
+    const userId = req.user._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Usuario no autenticado' });
+    }
+
+    const tasks = await Task.find({ usuario: userId });
+
     res.json(tasks);
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener las tareas', error });
+    return res.status(500).json({ message: 'Error al obtener las tareas', error });
   }
 }
 
-// Obtiene una tarea específica por su ID desde MongoDB
+
 async function getTaskById(req, res) {
   try {
     const { taskId } = req.params;
@@ -102,7 +109,6 @@ async function getTaskById(req, res) {
   }
 }
 
-// Obtiene todas las tareas con estado 'completada' desde MongoDB
 async function getCompletedTasks(req, res) {
   try {
     const completedTasks = await Task.find({ estado: 'completa' });
