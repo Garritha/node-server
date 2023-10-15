@@ -1,125 +1,52 @@
-const readline = require('readline');
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const db = require('./db'); // Importa la conexión a la base de datos desde db.js
+const cors = require('cors');
 
-// Crear interfaz para leer desde la consola
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+app.use(express.json());
+
+// Middleware para habilitar CORS
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
+
+// Rutas y middleware
+const errorHandler = require('./src/middlewares/errorHandler');
+const taskRoutes = require('./src/routes/taskRoutes');
+const authRoutes = require('./src/routes/authRoutes');
+const protectedRoutes = require('./src/routes/protectedRoutes');
+const userRoutes = require('./src/routes/userRoutes');
+
+// Agregamos las rutas
+app.use('/task', taskRoutes);
+app.use('/auth', authRoutes);
+app.use('/user', userRoutes);
+app.use('/protected', protectedRoutes); 
+
+// Middleware global para gestionar métodos HTTP no válidos
+app.use((req, res, next) => {
+  const validMethods = ['GET', 'POST', 'PUT', 'DELETE'];
+
+  if (!validMethods.includes(req.method)) {
+    return res.status(405).json({ message: 'Método no permitido' });
+  }
+
+  next();
 });
 
-// Array para almacenar las tareas
-let tareas = [];
+// Middleware global para manejo de errores
+app.use(errorHandler);
 
-// Función para añadir una nueva tarea
-function añadirTarea(indicador, descripcion, estado) {
-  return new Promise((resolve, reject) => {
-    const tarea = {
-      indicador: indicador,
-      descripcion: descripcion,
-      estado: estado
-    };
+// Página no encontrada (404)
+app.use((req, res) => {
+  res.status(404).end();
+});
 
-    tareas.push(tarea);
-    resolve();
-  });
-}
-
-// Función para eliminar una tarea
-function eliminarTarea(indicador) {
-  return new Promise((resolve, reject) => {
-    tareas = tareas.filter(tarea => tarea.indicador !== indicador);
-    resolve();
-  });
-}
-
-// Función para marcar una tarea como completada
-function completarTarea(indicador) {
-  return new Promise((resolve, reject) => {
-    tareas.forEach(tarea => {
-      if (tarea.indicador === indicador) {
-        tarea.estado = 'completada';
-      }
-    });
-    resolve();
-  });
-}
-
-// Función para mostrar la lista de tareas
-function mostrarTareas() {
-  console.log('Lista de tareas:');
-  tareas.forEach(tarea => {
-    console.log(`Indicador: ${tarea.indicador}`);
-    console.log(`Descripción: ${tarea.descripcion}`);
-    console.log(`Estado: ${tarea.estado}`);
-    console.log('---------------------');
-  });
-}
-
-// Función para ejecutar la opción seleccionada por el usuario
-async function ejecutarOpcion(opcion) {
-  switch (opcion) {
-    case '1': {
-      try {
-        const indicador = await prompt('Ingrese el indicador de la tarea: ');
-        const descripcion = await prompt('Ingrese la descripción de la tarea: ');
-        const estado = await prompt('Ingrese el estado de la tarea (completada o pendiente): ');
-
-        await añadirTarea(indicador, descripcion, estado);
-        console.log('Tarea añadida con éxito!');
-        mostrarTareas();
-      } catch (error) {
-        console.error('Error al añadir la tarea:', error);
-      }
-      rl.close();
-      break;
-    }
-    case '2': {
-      try {
-        const indicador = await prompt('Ingrese el indicador de la tarea que desea eliminar: ');
-        await eliminarTarea(indicador);
-        console.log('Tarea eliminada con éxito!');
-        mostrarTareas();
-      } catch (error) {
-        console.error('Error al eliminar la tarea:', error);
-      }
-      rl.close();
-      break;
-    }
-    case '3': {
-      try {
-        const indicador = await prompt('Ingrese el indicador de la tarea que desea marcar como completada: ');
-        await completarTarea(indicador);
-        console.log('Tarea marcada como completada con éxito!');
-        mostrarTareas();
-      } catch (error) {
-        console.error('Error al completar la tarea:', error);
-      }
-      rl.close();
-      break;
-    }
-    default: {
-      console.log('Opción no válida. Por favor, seleccione una opción válida.');
-      rl.close();
-      break;
-    }
-  }
-}
-
-// Función para solicitar una entrada al usuario
-function prompt(question) {
-  return new Promise((resolve, reject) => {
-    rl.question(question, answer => {
-      resolve(answer);
-    });
-  });
-}
-
-// Mostrar opciones al usuario
-console.log('Seleccione una opción:');
-console.log('1. Añadir tarea');
-console.log('2. Eliminar tarea');
-console.log('3. Completar tarea');
-
-// Leer opción seleccionada por el usuario
-rl.question('Opción: ', async opcion => {
-  await ejecutarOpcion(opcion);
+// Iniciar el servidor
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+  console.log(`Servidor Express iniciado en http://localhost:${port}`);
 });

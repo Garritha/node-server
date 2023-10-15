@@ -1,0 +1,6 @@
+[
+  { "id": "1", "descripcion": "'Sacar al perro'", "estado": false },
+  { "id": "2", "descripcion": "'caminar'", "estado": false },
+  { "id": "3", "descripcion": "'comer'", "estado": true }
+  
+]
