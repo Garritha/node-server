@@ -1,14 +1,15 @@
 require('dotenv').config();
 const express = require('express');
-const app = express();
-const db = require('./db'); // Importa la conexión a la base de datos desde db.js
 const cors = require('cors');
+const db = require('./db'); // Importa la conexión a la base de datos desde db.js
+
+const app = express();
 
 app.use(express.json());
 
 // Middleware para habilitar CORS
 app.use(cors({
-  origin: ' http://localhost:5173',
+  origin: 'http://localhost:5173', // Cambia esto a la URL correcta de tu frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
@@ -24,7 +25,7 @@ const userRoutes = require('./src/routes/userRoutes');
 app.use('/task', taskRoutes);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
-app.use('/protected', protectedRoutes); 
+app.use('/protected', protectedRoutes);
 
 // Middleware global para gestionar métodos HTTP no válidos
 app.use((req, res, next) => {

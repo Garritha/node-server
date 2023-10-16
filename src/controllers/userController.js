@@ -3,9 +3,8 @@ const User = require('../models/userSchema');
 const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");
 
-
-
 const secret = process.env.JWT_SECRET;
+
 // Función para crear un nuevo usuario
 async function createUser(req, res) {
   try {
@@ -18,18 +17,23 @@ async function createUser(req, res) {
       return res.status(400).json({ message: 'El usuario ya existe' });
     }
 
+    // Validar la contraseña
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ message: 'La contraseña no cumple con los requisitos' });
+    }
+
     // Cifrar la contraseña antes de guardarla en la base de datos
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
 
     // Crear y guardar el nuevo usuario
     const newUser = new User({
-      _id: new mongoose.Types.ObjectId(), // Genera un nuevo ID
+      _id: new mongoose.Types.ObjectId(),
       name,
       email,
       password: hashedPassword,
     });
-    console.log(newUser);
+
     await newUser.save();
 
     const token = jwt.sign({ userId: newUser._id, email: newUser.email }, secret, { expiresIn: '1h' });
@@ -40,7 +44,6 @@ async function createUser(req, res) {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 }
-// Resto del código sin cambios
 
 
 // Función para enviar una solicitud de restablecimiento de contraseña

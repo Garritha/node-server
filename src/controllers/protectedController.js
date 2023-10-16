@@ -1,7 +1,7 @@
 // protectedController.js
 const jwt = require('jsonwebtoken');
 
-function verifyToken(req, res) {
+function verifyToken(req, res, next) {
   const token = req.headers['authorization'];
 
   if (!token) {
@@ -14,7 +14,7 @@ function verifyToken(req, res) {
     }
 
     req.user = user;
-    res.json({ message: `Usuario autenticado: ${user.username}` });
+    next();
   });
 }
 

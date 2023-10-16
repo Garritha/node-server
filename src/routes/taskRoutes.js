@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
-const { authenticateToken } = require('../middlewares/authMiddleware');
 
-router.post('/crear', authenticateToken, taskController.createTask);
-router.put('/actualizar/:taskId', authenticateToken, taskController.updateTask);
-router.delete('/eliminar/:taskId', authenticateToken, taskController.deleteTask);
-
-router.get('/', taskController.getAllTasks);
-router.get('/completas', authenticateToken, taskController.getCompletedTasks);
-router.get('/incompletas', authenticateToken, taskController.getIncompleteTasks);
-router.get('/:taskId', authenticateToken, taskController.getTaskById);
-
+// Rutas públicas sin autenticación
+router.post('/crear', taskController.createTask);
+router.put('/actualizar/:taskId', taskController.updateTask);
+router.delete('/eliminar/:taskId', taskController.deleteTask);
+router.get('/completas', taskController.getCompletedTasks);
+router.get('/incompletas', taskController.getTasksIncomplete);
+router.get('/enproceso', taskController.getTasksInProgress);
+// Otras rutas públicas
+router.get('/usuario/:userId', taskController.getAllTasksByUser);
 module.exports = router;
