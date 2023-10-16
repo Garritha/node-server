@@ -1,7 +1,11 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/userSchema');
 const mongoose = require('mongoose');
+const jwt = require("jsonwebtoken");
 
+
+
+const secret = process.env.JWT_SECRET;
 // Función para crear un nuevo usuario
 async function createUser(req, res) {
   try {

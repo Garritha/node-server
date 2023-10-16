@@ -28,7 +28,7 @@ app.use('/protected', protectedRoutes);
 
 // Middleware global para gestionar métodos HTTP no válidos
 app.use((req, res, next) => {
-  const validMethods = ['GET', 'POST', 'PUT', 'DELETE'];
+  const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
 
   if (!validMethods.includes(req.method)) {
     return res.status(405).json({ message: 'Método no permitido' });

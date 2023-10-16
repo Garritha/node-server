@@ -7,7 +7,7 @@ router.post('/crear', authenticateToken, taskController.createTask);
 router.put('/actualizar/:taskId', authenticateToken, taskController.updateTask);
 router.delete('/eliminar/:taskId', authenticateToken, taskController.deleteTask);
 
-router.get('/', authenticateToken, taskController.getAllTasks);
+router.get('/', taskController.getAllTasks);
 router.get('/completas', authenticateToken, taskController.getCompletedTasks);
 router.get('/incompletas', authenticateToken, taskController.getIncompleteTasks);
 router.get('/:taskId', authenticateToken, taskController.getTaskById);

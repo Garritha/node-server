@@ -14,7 +14,7 @@ async function createTask(req, res) {
       _id: new mongoose.Types.ObjectId(),
       titulo,
       descripcion,
-      usuario: userId,
+      usuario: userId
     });
 
     await newTask.save();
