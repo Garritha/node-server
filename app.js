@@ -1,53 +1,46 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const db = require('./db'); // Importa la conexión a la base de datos desde db.js
+import express  from "express"; 
 
+import dotenv from "dotenv";
+import db from "./db.js";
+import UserRouter from "./src/routes/userRoute.js";
+import TareaRouter from "./src/routes/tareaRoute.js";
+import cors from "cors";
+
+
+// creacion de servidor
 const app = express();
+app.use(express.json()); 
+dotenv.config(); 
 
-app.use(express.json());
+// cors para que se pueda conectar con el front
 
-// Middleware para habilitar CORS
-app.use(cors({
-  origin: 'http://localhost:5173', // Cambia esto a la URL correcta de tu frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
+const dominiosPermitidos = ["http://localhost:5173"] // dominios permitidos para recibir peticiones
 
-// Rutas y middleware
-const errorHandler = require('./src/middlewares/errorHandler');
-const taskRoutes = require('./src/routes/taskRoutes');
-const authRoutes = require('./src/routes/authRoutes');
-const protectedRoutes = require('./src/routes/protectedRoutes');
-const userRoutes = require('./src/routes/userRoutes');
 
-// Agregamos las rutas
-app.use('/task', taskRoutes);
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
-app.use('/protected', protectedRoutes);
+const corsOptions = {
+    origin: function(origin, callback){
+        if(dominiosPermitidos.indexOf(origin) !== -1){
+            // El origen del request esta permitido
+            callback(null, true);
+        }else{
+            callback(new Error('No esta permitido por CORS'))
+        }
+    }
+}
+app.use(cors({ origin: '*' }))
 
-// Middleware global para gestionar métodos HTTP no válidos
-app.use((req, res, next) => {
-  const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'];
 
-  if (!validMethods.includes(req.method)) {
-    return res.status(405).json({ message: 'Método no permitido' });
-  }
+// rutas de  la aplicacion
 
-  next();
-});
 
-// Middleware global para manejo de errores
-app.use(errorHandler);
+app.use("/api/Usuario", UserRouter);
+app.use("/api/Tarea", TareaRouter);
 
-// Página no encontrada (404)
-app.use((req, res) => {
-  res.status(404).end();
-});
 
-// Iniciar el servidor
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Servidor Express iniciado en http://localhost:${port}`);
+
+// para correr el servidor
+const PORT =  8080;
+
+app.listen(PORT, () => {
+    console.log("Servidor ejecutandose en el puerto: 8080");
 });

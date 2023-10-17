@@ -1,15 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
+dotenv.config();
 // URI de conexión a la base de datos
 const uri = process.env.MONGODB_URI;
 
-// Conectar a la base de datos
-mongoose.connect(uri, {
+// Opciones de configuración para la conexión
+const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+};
 
-});
-
+// Conectar a la base de datos
 const db = mongoose.connection;
 
 db.on('error', (error) => {
@@ -20,4 +22,6 @@ db.once('open', () => {
   console.log('Conexión exitosa a la base de datos');
 });
 
-module.exports = db;
+mongoose.connect(uri, options);
+
+export default db;
