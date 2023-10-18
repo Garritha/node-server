@@ -1,5 +1,5 @@
 import express from "express";
-import Usuario from "../models/userModel.js";
+import usuario from "../models/userModel.js";
 import  bycscript from "bcryptjs";
 
 
