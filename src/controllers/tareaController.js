@@ -9,6 +9,7 @@ const agregarTarea = async (req, res) => {
       const Tasksave = await task.save(); 
       res.json({msg:"tarea creada" ,
       Tarea:Tasksave});
+      console.log(Tasksave);
     } catch (error) {
     // cacturar errores
       console.log(error);
@@ -42,16 +43,16 @@ const agregarTarea = async (req, res) => {
 
 const obtenerTareaid = async (req, res) => {
   const { id } = req.params; 
-  const task = await Tarea.findById(id); 
+  const task = await Tarea.findById(id);
   if (!task) {
-    // busca el id del task
-    res.status(404).json({ msg: "tarea no encontrado" }); 
-  }
+    res.status(404).json({ msg: "tarea no encontrado" });
+  } else {
     res.json({
-      // si el task existe
       msg: "tarea encontradas",
       task
     });
+  }
+  
   
 };
 
@@ -124,6 +125,20 @@ const cambiarEstadoTarea = async (req, res) => {
   }
    
 }
+const obtenerTareasPorUsuarioId = async (req, res) => {
+  const usuarioId = req.params.id; // Obtiene el ID del usuario desde los parámetros de la ruta
+
+  try {
+    // Utiliza Mongoose para encontrar todas las tareas asociadas con el ID del usuario
+    const tareas = await Tarea.find({ usuario: usuarioId });
+
+    // Devuelve las tareas como respuesta en formato JSON
+    res.json(tareas);
+  } catch (error) {
+    console.error("Error al obtener las tareas del usuario:", error);
+    res.status(500).json({ msg: "Error al obtener las tareas del usuario" });
+  }
+};
 
 export {
   agregarTarea,
@@ -131,6 +146,7 @@ export {
   actualizarTarea,
   obtenerTareas,
   obtenerTareaid,
-  cambiarEstadoTarea
+  cambiarEstadoTarea,
+  obtenerTareasPorUsuarioId
 
 } 

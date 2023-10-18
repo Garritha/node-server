@@ -11,7 +11,7 @@ const router = express.Router();
 
 // rutas de veterinario publicas
 
-router.post("/", Registrar);
+router.post("/crear-user", Registrar);
 router.put("/:id", ModificarUsuario);
 
 // rutas de  iniciar seccion

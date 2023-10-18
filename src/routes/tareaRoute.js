@@ -5,22 +5,24 @@ import {
   actualizarTarea,
   obtenerTareas,
   obtenerTareaid,
-  cambiarEstadoTarea
+  cambiarEstadoTarea,
+  obtenerTareasPorUsuarioId
   
 } from "../controllers/tareaController.js";
 const router = express.Router();
 
 
 router
-  .route("/")
+  .route("/crear")
   .post(agregarTarea)
   
-  router.get("/usuario/:id", obtenerTareas);
-
+  router.get("/", obtenerTareas);
+  router.get("/:id/tareas", obtenerTareasPorUsuarioId)
   // operaciones del crud 
   router
     .route("/:id")
     .get(obtenerTareaid)
+    
     .put(actualizarTarea)
     .delete(eliminarTarea)
     .patch(cambiarEstadoTarea);
