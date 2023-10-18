@@ -1,52 +1,41 @@
-require('dotenv').config();
-const express = require('express');
+import express  from "express"; 
+
+import dotenv from "dotenv";
+import db from "./db.js";
+import UserRouter from "./src/routes/userRoute.js";
+import TareaRouter from "./src/routes/tareaRoute.js";
+import cors from "cors";
+
+
+// creacion de servidor
 const app = express();
-const db = require('./db'); // Importa la conexión a la base de datos desde db.js
-const cors = require('cors');
+app.use(express.json()); 
+dotenv.config(); 
 
-app.use(express.json());
+// cors para que se pueda conectar con el front
 
-// Middleware para habilitar CORS
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
+ // dominios permitidos para recibir peticiones
 
-// Rutas y middleware
-const errorHandler = require('./src/middlewares/errorHandler');
-const taskRoutes = require('./src/routes/taskRoutes');
-const authRoutes = require('./src/routes/authRoutes');
-const protectedRoutes = require('./src/routes/protectedRoutes');
-const userRoutes = require('./src/routes/userRoutes');
 
-// Agregamos las rutas
-app.use('/task', taskRoutes);
-app.use('/auth', authRoutes);
-app.use('/user', userRoutes);
-app.use('/protected', protectedRoutes); 
+ const corsOptions = {
+    origin: '*',
+    methods: 'GET, POST, PUT, DELETE, PATCH, HEAD',
+};
 
-// Middleware global para gestionar métodos HTTP no válidos
-app.use((req, res, next) => {
-  const validMethods = ['GET', 'POST', 'PUT', 'DELETE'];
+app.use(cors(corsOptions));
 
-  if (!validMethods.includes(req.method)) {
-    return res.status(405).json({ message: 'Método no permitido' });
-  }
 
-  next();
-});
+// rutas de  la aplicacion
 
-// Middleware global para manejo de errores
-app.use(errorHandler);
 
-// Página no encontrada (404)
-app.use((req, res) => {
-  res.status(404).end();
-});
+app.use("/v1/User", UserRouter);
+app.use("/v1/Tarea", TareaRouter);
 
-// Iniciar el servidor
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-  console.log(`Servidor Express iniciado en http://localhost:${port}`);
+
+
+// para correr el servidor
+const PORT =  8080;
+
+app.listen(PORT, () => {
+    console.log("Servidor ejecutandose en el puerto" + PORT);
 });
