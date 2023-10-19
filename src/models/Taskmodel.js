@@ -1,34 +1,37 @@
-import mongoose from "mongoose"; 
+import mongoose from "mongoose";
 
 const taskSchema = mongoose.Schema({
-  titulo:{
+  titulo: {
     type: String,
     required: true,
-
   },
-  descripcion:{
-  type: String,
-  required: true,
-  },  
-  fecha:{
+  descripcion: {
+    type: String,
+    required: true,
+  },
+  fecha: {
     type: Date,
     required: true,
-    default: Date.now()
-   },
-  complete:{
+    default: Date.now(),
+  },
+  complete: {
     type: String,
     default: "pendiente",
-  }, 
-  usuario:{
+  },
+  eliminada: {
+    type: Boolean,
+    default: false,
+  },
+  fechaEliminacion: {
+    type: Date,
+    default: null,
+  },
+  usuario: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "usuario"
-  }
- 
+    ref: "usuario",
+  },
+});
 
-},
-
-)
-
-const  Tarea= mongoose.model('Tarea', taskSchema);
+const Tarea = mongoose.model("Tarea", taskSchema);
 
 export default Tarea;

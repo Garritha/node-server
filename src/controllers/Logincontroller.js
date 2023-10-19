@@ -46,6 +46,7 @@ const autenticar = async (req, res) => {
       id,
       token,
     });
+    console.log(usuario);
   } catch (error) {
     console.log(error);
     res.status(500).json({

@@ -33,6 +33,7 @@ const Registrar = async (req, res) => {
            User
        });
        
+       console.log(User);
    }catch (err) {
        console.log(err);
        return res.status(500).json({

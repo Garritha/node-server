@@ -1,4 +1,6 @@
 import Tarea from "../models/Taskmodel.js";
+import TareaEliminada from "../models/TaskDelete.js";
+import mongoose from "mongoose";
 
 const agregarTarea = async (req, res) => {
   // llenar datos
@@ -81,22 +83,24 @@ const actualizarTarea = async (req, res) => {
   }3
 };
 
-const eliminarTarea= async (req, res) => {
-  // eliminar task
-  const { id } = req.params; // obtener el id del task
-  const task = await Tarea.findById(id); // obtener task por id
+const eliminarTarea = async (req, res) => {
+  const { id } = req.params; // Obtén el ID de la tarea a eliminar
+  const task = await Tarea.findById(id); // Obtén la tarea por su ID
   if (!task) {
-    res.status(404).json({ msg: "tarea no encontrada" });
+    return res.status(404).json({ msg: "Tarea no encontrada" });
   }
 
-
-  // si  la tarea  existe y el id referenciado es valido
+  // Si la tarea existe y el ID referenciado es válido
+  // Actualiza la tarea en lugar de eliminarla
+  task.eliminada = true; // Marca la tarea como eliminada
+  task.fechaEliminacion = new Date(); // Establece la fecha de eliminación
 
   try {
-    await task.deleteOne();
-    res.json({ msg: "task eliminado" });
+    await task.save(); // Guarda la tarea actualizada en la base de datos
+    return res.json({ msg: "Tarea marcada como eliminada" });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({ msg: "Error al marcar la tarea como eliminada" });
   }
 };
 
@@ -140,6 +144,51 @@ const obtenerTareasPorUsuarioId = async (req, res) => {
   }
 };
 
+// En tu controlador (tareaController.js)
+
+const moverTareaAEliminadas = async (taskId) => {
+  try {
+    if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
+      // Si el taskId no es válido, puedes devolver un error o un mensaje
+      return { error: 'ID de tarea no válido' };
+    }
+
+    const task = await Tarea.findById(taskId);
+
+    if (!task) {
+      // Si la tarea no se encuentra, puedes devolver un error o un mensaje
+      return { error: 'Tarea no encontrada' };
+    }
+
+    const tareaEliminada = new TareaEliminada({
+      titulo: task.titulo,
+      descripcion: task.descripcion,
+      fechaEliminacion: task.fechaEliminacion,
+      eliminada: task.eliminada,
+      usuario: task.usuario
+    });
+
+    await tareaEliminada.save();
+
+    // Ahora elimina la tarea si es necesario
+    await Tarea.findByIdAndDelete(taskId);
+
+    console.log("Tarea eliminada");
+    return tareaEliminada;
+  } catch (error) {
+    console.error(error);
+    return { error: 'Error al mover la tarea a eliminadas' };
+  }
+};
+
+
+
+
+  
+  // si  la tarea  existe y el id referenciado es valido
+  // actulizar tarea
+
+
 export {
   agregarTarea,
   eliminarTarea,
@@ -147,6 +196,7 @@ export {
   obtenerTareas,
   obtenerTareaid,
   cambiarEstadoTarea,
-  obtenerTareasPorUsuarioId
+  obtenerTareasPorUsuarioId,
+  moverTareaAEliminadas
 
 } 
