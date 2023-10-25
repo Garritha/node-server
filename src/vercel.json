@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "app.js", // Asegúrate de que esta ruta sea la correcta al archivo principal de tu aplicación.
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      { "handle": "filesystem" },
+      {
+        "src": "/v1/User/(.*)", // Ruta para las rutas de usuario
+        "dest": "/v1/User/$1" // Dirección real de las rutas de usuario
+      },
+      {
+        "src": "/v1/Tarea/(.*)", // Ruta para las rutas de tareas
+        "dest": "/v1/Tarea/$1" // Dirección real de las rutas de tareas
+      },
+      {
+        "src": "/(.*)",
+        "dest": "app.js" // Maneja todas las demás rutas y apunta a tu archivo principal (app.js)
+      }
+    ]
+  }
+  
